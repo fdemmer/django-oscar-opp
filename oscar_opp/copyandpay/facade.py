@@ -103,16 +103,13 @@ class Facade(object):
             )
 
     def get_payment_status(self):
-        payment_status_response = self.gateway.get_payment_status(self.transaction.checkout_id)
+        response = self.gateway.get_payment_status(self.transaction.checkout_id)
+        result_code = response.json().get('result', {}).get('code')
 
         try:
-            self.transaction.result_code = payment_status_response.json().get('result', {}).get('code')
-            self.transaction.save()
-            payment_status = PaymentStatusCode(self.transaction.result_code)
+            return PaymentStatusCode(result_code)
         except ValueError: #either the response doesn't contain a valid JSON or the result_code is unknown
-            payment_status = PaymentStatusCode.UNKNOWN_ERROR
-
-        return payment_status
+            return PaymentStatusCode.UNKNOWN_ERROR
 
     def get_payment_brands(self, payment_method=None):
         payment_method = payment_method \
