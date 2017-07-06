@@ -43,7 +43,7 @@ class Facade(object):
                 self.transaction.checkout_id = response.json().get('id')
                 self.transaction.result_code = response.json().get('result')['code']
             else:
-                # add error handling
+                #TODO: Add error handling
                 pass
             self.transaction.save()
 
