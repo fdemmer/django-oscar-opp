@@ -73,5 +73,5 @@ class Gateway(object):
         response = requests.get(
             parse.urljoin(self.host, self.CHECKOUTS_DETAIL_ENDPOINT.format(checkout_id=checkout_id))
         )
-        return response.status_code
+        return response
 
