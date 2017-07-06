@@ -53,7 +53,13 @@ class Facade(object):
             )
 
     def get_payment_status(self):
-        return self.gateway.get_payment_status(self.transaction.checkout_id)
+        payment_status_response = self.gateway.get_payment_status(self.transaction.checkout_id)
+
+        self.transaction.result_code = payment_status_response.json().get('result')['code']
+        self.transaction.save()
+
+        return payment_status_response.status_code
+
 
     def get_payment_brands(self, payment_method=None):
         payment_method = payment_method \
