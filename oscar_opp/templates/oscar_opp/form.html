@@ -29,4 +29,5 @@ onChangeBrand: function(e) {
 </script>
 <script async src="https://test.oppwa.com/v1/paymentWidgets.js?checkoutId={{ checkout_id }}"></script>
 
+<script async src="{{ opp_base_url }}paymentWidgets.js?checkoutId={{ checkout_id }}"></script>
 <form action="{{ callback }}" class="paymentWidgets">{{ payment_method }}</form>
