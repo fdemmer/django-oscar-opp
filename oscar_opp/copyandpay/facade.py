@@ -21,9 +21,9 @@ class Facade(object):
 
     def __init__(self, checkout_id=None):
         self.gateway = Gateway(
-            host=settings.OPP_BASEURL,
-            auth_userid=settings.OPP_USERID,
-            auth_entityid=settings.OPP_ENTITYID,
+            host=settings.OPP_BASE_URL,
+            auth_userid=settings.OPP_USER_ID,
+            auth_entityid=settings.OPP_ENTITY_ID,
             auth_password=settings.OPP_PASSWORD
         )
         if checkout_id:
