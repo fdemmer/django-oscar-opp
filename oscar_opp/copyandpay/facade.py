@@ -1,24 +1,15 @@
 # -*- coding: utf-8 -*-
-
 from decimal import Decimal as D
 
 from django.conf import settings
 from django.template.loader import get_template
 
+from .gateway import Gateway
 from ..exceptions import OpenPaymentPlatformError
 from ..models import Transaction
-from .gateway import Gateway
 
 
 class Facade(object):
-
-    PAYMENT_METHODS = {
-        'opp_card': 'VISA MASTER AMEX',
-        'opp_eps': 'EPS'
-
-    }
-
-
     def __init__(self, checkout_id=None):
         self.gateway = Gateway(
             host=settings.OPP_BASE_URL,
@@ -64,18 +55,17 @@ class Facade(object):
     def get_payment_status(self):
         return self.gateway.get_payment_status(self.transaction.checkout_id)
 
+    def get_payment_brands(self, payment_method=None):
+        payment_method = payment_method \
+            if payment_method else settings.DEFAULT_PAYMENT_METHOD
+        return settings.OPP_PAYMENT_METHODS.get(payment_method)
+
     def get_form(self, callback, locale, payment_method=None, address=None):
-
-        payment_method = self.PAYMENT_METHODS.get(
-            payment_method,
-            self.PAYMENT_METHODS.get('opp_card')
-        )
-
         ctx = {
             'checkout_id': self.transaction.checkout_id,
             'locale': locale,
             'address': address,
-            'payment_method': payment_method,
+            'payment_method': self.get_payment_brands(payment_method),
             'callback': callback,
         }
         template = get_template('oscar_opp/form.html')
