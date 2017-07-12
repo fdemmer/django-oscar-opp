@@ -67,7 +67,7 @@ class Facade(object):
             'address': address,
             'payment_method': self.get_payment_brands(payment_method),
             'callback': callback,
-            'opp_base_url': settings.OPP_BASE_URL
+            'gateway_host': self.gateway.host,
         }
         template = get_template('oscar_opp/form.html')
         return template.render(ctx)
