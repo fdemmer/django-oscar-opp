@@ -58,7 +58,7 @@ class Facade(object):
         self.transaction.result_code = payment_status_response.json().get('result')['code']
         self.transaction.save()
 
-        return payment_status_response.status_code
+        return payment_status_response
 
 
     def get_payment_brands(self, payment_method=None):
