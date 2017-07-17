@@ -70,7 +70,7 @@ class Facade(object):
             if payment_method else settings.DEFAULT_PAYMENT_METHOD
         return settings.OPP_PAYMENT_METHODS.get(payment_method)
 
-    def get_form(self, callback, locale, payment_method=None, address=None):
+    def get_form(self, callback, locale, payment_method=None, address=None, error_message=None):
         ctx = {
             'checkout_id': self.transaction.checkout_id,
             'locale': locale,
@@ -78,6 +78,7 @@ class Facade(object):
             'payment_method': self.get_payment_brands(payment_method),
             'callback': callback,
             'gateway_host': self.gateway.host,
+            'error_message': error_message
         }
         template = get_template('oscar_opp/form.html')
         return template.render(ctx)
