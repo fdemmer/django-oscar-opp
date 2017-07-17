@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal as D
 
+import logging
+
 from django.conf import settings
 from django.template.loader import get_template
 
 from .gateway import Gateway
 from ..exceptions import OpenPaymentPlatformError
 from ..models import Transaction
+
+logger = logging.getLogger('opp')
 
 
 class Facade(object):
