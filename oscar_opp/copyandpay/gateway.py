@@ -67,11 +67,13 @@ class Gateway(object):
             parse.urljoin(self.host, self.CHECKOUTS_ENDPOINT),
             data
         )
+        logger.debug('Url: {}\nHeaders: {}\nStatus: {}\nData: {}'.format(response.url, response.headers, response.status_code, repr(response.content)))
         return response
 
     def get_payment_status(self, checkout_id):
         response = requests.get(
             parse.urljoin(self.host, self.CHECKOUTS_DETAIL_ENDPOINT.format(checkout_id=checkout_id))
         )
+        logger.debug('Url: {}\nHeaders: {}\nStatus: {}\nData: {}'.format(response.url, response.headers, response.status_code, repr(response.content)))
         return response
 
