@@ -2,6 +2,7 @@
 from decimal import Decimal as D
 
 import logging
+from enum import Enum, unique
 
 from django.conf import settings
 from django.template.loader import get_template
@@ -11,6 +12,48 @@ from ..exceptions import OpenPaymentPlatformError
 from ..models import Transaction
 
 logger = logging.getLogger('opp')
+
+@unique
+class PaymentStatusCode(Enum):
+    UNKNOWN_ERROR = ''
+    TRANSACTION_SUCCEEDED = '000.000.000'
+    SUCCESSFUL_REQUEST = '000.000.100'
+    SUCCESS_INTEGRATOR_TEST_MODE = '000.100.110'
+    SUCCESS_VALIDATOR_TEST_MODE = '000.100.111'
+    SUCCESS_CONNECTOR_TEST_MODE = '000.100.112'
+    USER_AUTHENTICATION_FAILED = '100.380.401'
+    PARES_VALIDATION_FAILED_SIGNATURE = '100.390.103'
+    TRANSACTION_REJECTED_NO_3D_PROGRAM = '100.390.108'
+    CANNOT_FIND_TRANSACTION = '700.400.580'
+    TRANSACTION_DECLINED = '800.100.152'
+    TRANSACTION_DECLINED_INVALID_CARD = '800.100.151'
+
+    def get_message(self):
+        descriptions = {
+            PaymentStatusCode.UNKNOWN_ERROR: 'Bei der Zahlung ist ein Fehler aufgetreten',
+            PaymentStatusCode.SUCCESSFUL_REQUEST: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_INTEGRATOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_VALIDATOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_CONNECTOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.USER_AUTHENTICATION_FAILED: 'Authentifizierung fehlgeschlagen',
+            PaymentStatusCode.PARES_VALIDATION_FAILED_SIGNATURE: 'Signatur Validierung fehlgeschlagen.',
+            PaymentStatusCode.TRANSACTION_REJECTED_NO_3D_PROGRAM: 'Die Zahlung kann mit dieser Kreditkarte nicht durchgeführt werden.',
+            PaymentStatusCode.CANNOT_FIND_TRANSACTION: 'Unbekannte Kreditkarte',
+            PaymentStatusCode.TRANSACTION_DECLINED: 'Transaktion wurde abgelehnt.',
+            PaymentStatusCode.TRANSACTION_DECLINED_INVALID_CARD: 'Unbekannte Kreditkarte'
+        }
+        return descriptions.get(self, '')
+
+    def is_valid_status(self):
+        return any([status == self for status in VALID_STATUS_CODES])
+
+
+VALID_STATUS_CODES = [
+    PaymentStatusCode.SUCCESSFUL_REQUEST,
+    PaymentStatusCode.SUCCESS_CONNECTOR_TEST_MODE,
+    PaymentStatusCode.SUCCESS_INTEGRATOR_TEST_MODE,
+    PaymentStatusCode.SUCCESS_VALIDATOR_TEST_MODE
+]
 
 
 class Facade(object):
@@ -59,11 +102,14 @@ class Facade(object):
     def get_payment_status(self):
         payment_status_response = self.gateway.get_payment_status(self.transaction.checkout_id)
 
-        self.transaction.result_code = payment_status_response.json().get('result')['code']
-        self.transaction.save()
+        try:
+            self.transaction.result_code = payment_status_response.json().get('result', {}).get('code')
+            self.transaction.save()
+            payment_status = PaymentStatusCode(self.transaction.result_code)
+        except ValueError: #either the response doesn't contain a valid JSON or the result_code is unknown
+            payment_status = PaymentStatusCode.UNKNOWN_ERROR
 
-        return payment_status_response
-
+        return payment_status
 
     def get_payment_brands(self, payment_method=None):
         payment_method = payment_method \
