@@ -71,12 +71,14 @@ class Facade(object):
         else:
             self.transaction = None
 
-    def prepare_checkout(self, amount, currency, correlation_id=None):
+    def prepare_checkout(self, amount, currency, correlation_id=None, merchant_transaction_id=None):
         if not self.transaction:
             response = self.gateway.get_checkout_id(
                 amount=D(amount),
                 currency=currency,
-                payment_type='DB'
+                payment_type='DB',
+                merchant_transaction_id=merchant_transaction_id,
+                merchant_invoice_id=correlation_id
             )
             self.transaction = Transaction(
                 amount=amount,
@@ -84,7 +86,7 @@ class Facade(object):
                 raw_request=response.request.body,
                 raw_response=response.content,
                 response_time=response.elapsed.total_seconds() * 1000,
-                correlation_id=correlation_id,
+                correlation_id=correlation_id
             )
             if response.ok:
                 self.transaction.checkout_id = response.json().get('id')
