@@ -7,6 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import base
 
+SUCCESS = '000.000.100'
+SUCCESS_INTEGRATOR_TEST_MODE = '000.100.110'
+SUCCESS_VALIDATOR_TEST_MODE = '000.100.111'
+SUCCESS_CONNECTOR_TEST_MODE = '000.100.112'
+
 
 @python_2_unicode_compatible
 class Transaction(base.ResponseModel):
@@ -18,6 +23,13 @@ class Transaction(base.ResponseModel):
         (r'userId=\w+&', 'userId=XXXXXX&'),
         (r'entityID=\w+&', 'entityID=XXXXXX&')
     ]
+
+    SUCCESS_CODES = {
+        SUCCESS,
+        SUCCESS_CONNECTOR_TEST_MODE,
+        SUCCESS_INTEGRATOR_TEST_MODE,
+        SUCCESS_VALIDATOR_TEST_MODE,
+    }
 
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     currency = models.CharField(max_length=8, null=True, blank=True)
@@ -33,15 +45,13 @@ class Transaction(base.ResponseModel):
         ordering = ('-date_created',)
 
     def __str__(self):
-        return "Transaction %s" % self.id
+        return "Transaction %s" % self.id or 'unsaved'
+
+    @property
+    def is_success(self):
+        return self.result_code in self.SUCCESS_CODES
 
     def save(self, *args, **kwargs):
         for regex, s in self.CLEAN_REGEX:
             self.raw_request = re.sub(regex, s, self.raw_request)
         return super(Transaction, self).save(*args, **kwargs)
-
-    @property
-    def is_successful(self):
-        return self.ack in (self.SUCCESS, self.SUCCESS_WITH_WARNING)
-
-
