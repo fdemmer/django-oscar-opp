@@ -96,11 +96,13 @@ class Facade(object):
                 checkout_id = data.get('id')
                 result = data.get('result', {})
                 result_code = result.get('code')
+                result_description = result.get('description')
 
-                logger.debug('prepare_checkout success: id=%s, code=%s',
-                             checkout_id, result_code)
+                logger.debug('prepare_checkout success: id=%s, code=%s "%s"',
+                             checkout_id, result_code, result_description)
                 self.transaction.checkout_id = checkout_id
                 self.transaction.result_code = result_code
+                self.transaction.result_description = result_description
             else:
                 #TODO: Add error handling
                 pass
