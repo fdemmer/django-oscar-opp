@@ -1,3 +1,4 @@
+# noinspection PyUnresolvedReferences
 from django.conf import settings  # noqa
 
 # this is not django's AppConf!

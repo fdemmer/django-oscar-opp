@@ -4,11 +4,10 @@ Based (copied) from https://github.com/django-oscar/django-oscar-paypal/blob/mas
 
 """
 from __future__ import unicode_literals
-from django.utils import six
-#from django.utils.six.moves.urllib.parse import parse_qsl
-from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
+from django.utils import six
+from django.utils.translation import ugettext_lazy as _
 
 
 class ResponseModel(models.Model):
