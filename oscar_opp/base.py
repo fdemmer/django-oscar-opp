@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import six
-# from django.utils.six.moves.urllib.parse import parse_qsl
 from django.utils.translation import ugettext_lazy as _
 
 
