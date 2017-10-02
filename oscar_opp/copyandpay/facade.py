@@ -92,8 +92,15 @@ class Facade(object):
                 correlation_id=correlation_id,
             )
             if response.ok:
-                self.transaction.checkout_id = response.json().get('id')
-                self.transaction.result_code = response.json().get('result')['code']
+                data = response.json()
+                checkout_id = data.get('id')
+                result = data.get('result', {})
+                result_code = result.get('code')
+
+                logger.debug('prepare_checkout success: id=%s, code=%s',
+                             checkout_id, result_code)
+                self.transaction.checkout_id = checkout_id
+                self.transaction.result_code = result_code
             else:
                 #TODO: Add error handling
                 pass
@@ -107,11 +114,12 @@ class Facade(object):
     def get_payment_status(self):
         response = self.gateway.get_payment_status(self.transaction.checkout_id)
         result_code = response.json().get('result', {}).get('code')
+        logger.debug('get_payment_status: code=%s', result_code)
 
         try:
             return PaymentStatusCode(result_code)
         except ValueError:
-            # either the response doesn't contain a valid JSON or the result_code is unknown
+            # response doesn't contain valid JSON or the result_code is unknown
             return PaymentStatusCode.UNKNOWN_ERROR
 
     def get_payment_brands(self, payment_method=None):
