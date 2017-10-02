@@ -43,4 +43,4 @@ var wpwlOptions = {
 </script>
 
 <script async src="{{ gateway_host }}paymentWidgets.js?checkoutId={{ checkout_id }}"></script>
-<form action="{{ callback }}" class="paymentWidgets">{{ payment_method }}</form>
+<form action="{{ shopper_result_url }}" class="paymentWidgets" data-brands="{{ payment_method }}"></form>

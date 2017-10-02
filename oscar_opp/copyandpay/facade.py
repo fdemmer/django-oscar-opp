@@ -164,7 +164,7 @@ class Facade(object):
             'locale': locale,
             'address': address,
             'payment_method': self.get_payment_brands(payment_method),
-            'callback': callback,
+            'shopper_result_url': callback,
             'gateway_host': self.gateway.host,
         }
         template = get_template('oscar_opp/form.html')
