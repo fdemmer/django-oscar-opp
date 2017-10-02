@@ -17,9 +17,9 @@ var wpwlOptions = {
     onError: function(error) {
         if (error.name === "InvalidCheckoutIdError") {
             // Shopper waits for 30 minutes and pays then. The checkoutId is already expired. See error.message for details
-        } else if (error.name == "PciIframeSubmitError") {
+        } else if (error.name === "PciIframeSubmitError") {
             //  Error submitting card number or/and card cvv, e.g. the request run into a timeout. See error.message for details
-        } else if (errror.name == "PciIframeCommunicationError") {
+        } else if (errror.name === "PciIframeCommunicationError") {
             // Merchant page is not able to communicate with PCI iframes. See error.message for details
         }
 
