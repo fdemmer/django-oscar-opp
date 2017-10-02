@@ -75,6 +75,17 @@ class Facade(object):
 
     def prepare_checkout(self, amount, currency, correlation_id=None,
                          merchant_transaction_id=None):
+        """
+        COPYandPAY step 1: Prepare the checkout
+
+        https://docs.oppwa.com/tutorials/integration-guide#CNPStep1
+
+        :param amount:
+        :param currency:
+        :param correlation_id:
+        :param merchant_transaction_id:
+        :return:
+        """
         if not self.transaction:
             response = self.gateway.get_checkout_id(
                 amount=D(amount),
@@ -114,6 +125,13 @@ class Facade(object):
             )
 
     def get_payment_status(self):
+        """
+        COPYandPAY step 3: Get the payment status
+
+        https://docs.oppwa.com/tutorials/integration-guide#CNPStep3
+
+        :return:
+        """
         response = self.gateway.get_payment_status(self.transaction.checkout_id)
         result_code = response.json().get('result', {}).get('code')
         logger.debug('get_payment_status: code=%s', result_code)
@@ -130,6 +148,17 @@ class Facade(object):
         return settings.OPP_PAYMENT_METHODS.get(payment_method)
 
     def get_form(self, callback, locale, payment_method=None, address=None):
+        """
+        COPYandPAY step 2: Create the payment form
+
+        https://docs.oppwa.com/tutorials/integration-guide#CNPStep2
+
+        :param callback:
+        :param locale:
+        :param payment_method:
+        :param address:
+        :return:
+        """
         ctx = {
             'checkout_id': self.transaction.checkout_id,
             'locale': locale,
