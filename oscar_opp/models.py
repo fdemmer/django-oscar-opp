@@ -89,7 +89,5 @@ class Transaction(base.ResponseModel):
         return super(Transaction, self).save(*args, **kwargs)
 
     @property
-    def is_successful(self):
-        return self.ack in (self.SUCCESS, self.SUCCESS_WITH_WARNING)
-
-
+    def is_approved(self):
+        return self.result_code in VALID_STATUS_CODES
