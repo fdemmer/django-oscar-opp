@@ -86,44 +86,45 @@ class Facade(object):
         :param merchant_transaction_id:
         :return:
         """
-        if not self.transaction:
-            response = self.gateway.get_checkout_id(
-                amount=D(amount),
-                currency=currency,
-                payment_type=payment_type,
-                merchant_transaction_id=merchant_transaction_id,
-                merchant_invoice_id=merchant_invoice_id,
-            )
-            self.transaction = Transaction(
-                amount=amount,
-                currency=currency,
-                raw_request=response.request.body,
-                raw_response=response.content,
-                response_time=response.elapsed.total_seconds() * 1000,
-                correlation_id=merchant_invoice_id,
-            )
-            if not response.ok:
-                logger.error('prepare_checkout: %s', response.status_code)
-            else:
-                data = response.json()
-                checkout_id = data.get('id')
-                result_code, result_description = get_result(data)
-
-                logger.info('prepare_checkout success: checkout_id="%s", '
-                            'result_code="%s", result_description="%s"',
-                             checkout_id, result_code, result_description)
-                self._update_transaction(
-                    checkout_id=checkout_id,
-                    result_code=result_code,
-                    result_description=result_description,
-                )
-
-            self.transaction.save()
-
-        else:
+        if self.transaction:
             raise OpenPaymentPlatformError(
                 "This instance is already linked to a Transaction"
             )
+
+        response = self.gateway.get_checkout_id(
+            amount=D(amount),
+            currency=currency,
+            payment_type=payment_type,
+            merchant_transaction_id=merchant_transaction_id,
+            merchant_invoice_id=merchant_invoice_id,
+        )
+
+        self.transaction = Transaction(
+            amount=amount,
+            currency=currency,
+            raw_request=response.request.body,
+            raw_response=response.content,
+            response_time=response.elapsed.total_seconds() * 1000,
+            correlation_id=merchant_invoice_id,
+        )
+
+        if not response.ok:
+            logger.error('prepare_checkout: %s', response.status_code)
+        else:
+            data = response.json()
+            checkout_id = data.get('id')
+            result_code, result_description = get_result(data)
+
+            logger.info('prepare_checkout success: checkout_id="%s", '
+                        'result_code="%s", result_description="%s"',
+                         checkout_id, result_code, result_description)
+            self._update_transaction(
+                checkout_id=checkout_id,
+                result_code=result_code,
+                result_description=result_description,
+            )
+
+        self.transaction.save()
 
     def get_payment_status(self):
         """
