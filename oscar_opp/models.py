@@ -2,12 +2,58 @@
 from __future__ import unicode_literals
 
 import re
+from enum import Enum, unique
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from . import base
+
+
+@unique
+class PaymentStatusCode(Enum):
+    UNKNOWN_ERROR = ''
+    TRANSACTION_SUCCEEDED = '000.000.000'
+    SUCCESSFUL_REQUEST = '000.000.100'
+    SUCCESS_CHECKOUT_CREATED = '000.200.100'
+    SUCCESS_INTEGRATOR_TEST_MODE = '000.100.110'
+    SUCCESS_VALIDATOR_TEST_MODE = '000.100.111'
+    SUCCESS_CONNECTOR_TEST_MODE = '000.100.112'
+    USER_AUTHENTICATION_FAILED = '100.380.401'
+    PARES_VALIDATION_FAILED_SIGNATURE = '100.390.103'
+    TRANSACTION_REJECTED_NO_3D_PROGRAM = '100.390.108'
+    CANNOT_FIND_TRANSACTION = '700.400.580'
+    TRANSACTION_DECLINED = '800.100.152'
+    TRANSACTION_DECLINED_INVALID_CARD = '800.100.151'
+
+    def get_message(self):
+        descriptions = {
+            PaymentStatusCode.UNKNOWN_ERROR: 'Bei der Zahlung ist ein Fehler aufgetreten',
+            PaymentStatusCode.SUCCESSFUL_REQUEST: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_INTEGRATOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_VALIDATOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.SUCCESS_CONNECTOR_TEST_MODE: 'Buchung erfolgreich',
+            PaymentStatusCode.USER_AUTHENTICATION_FAILED: 'Authentifizierung fehlgeschlagen',
+            PaymentStatusCode.PARES_VALIDATION_FAILED_SIGNATURE: 'Signatur Validierung fehlgeschlagen.',
+            PaymentStatusCode.TRANSACTION_REJECTED_NO_3D_PROGRAM: 'Die Zahlung kann mit dieser Kreditkarte nicht durchgeführt werden.',
+            PaymentStatusCode.CANNOT_FIND_TRANSACTION: 'Unbekannte Kreditkarte',
+            PaymentStatusCode.TRANSACTION_DECLINED: 'Transaktion wurde abgelehnt.',
+            PaymentStatusCode.TRANSACTION_DECLINED_INVALID_CARD: 'Unbekannte Kreditkarte'
+        }
+        return descriptions.get(self, '')
+
+    def is_valid_status(self):
+        return any([status == self for status in VALID_STATUS])
+
+
+VALID_STATUS = [
+    PaymentStatusCode.SUCCESSFUL_REQUEST,
+    PaymentStatusCode.SUCCESS_CONNECTOR_TEST_MODE,
+    PaymentStatusCode.SUCCESS_INTEGRATOR_TEST_MODE,
+    PaymentStatusCode.SUCCESS_VALIDATOR_TEST_MODE
+]
+VALID_STATUS_CODES = [s.value for s in VALID_STATUS]
 
 
 @python_2_unicode_compatible
