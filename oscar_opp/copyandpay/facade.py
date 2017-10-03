@@ -55,8 +55,18 @@ class Facade(object):
             return self.transaction.amount
 
     def _update_transaction(self, **kwargs):
-        for key, value in kwargs:
+        """
+        Update self.transaction with the given kwargs.
+
+        :param commit: save transaction after update, default: False
+        :param kwargs:
+        :return: None
+        """
+        commit = kwargs.pop('commit', False)
+        for key, value in kwargs.items():
             setattr(self.transaction, key, value)
+        if commit:
+            self.transaction.save()
 
     def prepare_checkout(
             self, amount, currency,
