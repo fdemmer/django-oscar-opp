@@ -34,6 +34,10 @@ class Facade(object):
         else:
             self.transaction = None
 
+    def _update_transaction(self, **kwargs):
+        for key, value in kwargs:
+            setattr(self.transaction, key, value)
+
     def prepare_checkout(self, amount, currency,
                          payment_type='DB',
                          merchant_invoice_id=None,
@@ -67,19 +71,21 @@ class Facade(object):
                 response_time=response.elapsed.total_seconds() * 1000,
                 correlation_id=merchant_invoice_id,
             )
-            if response.ok:
+            if not response.ok:
+                logger.error('prepare_checkout: %s', response.status_code)
+            else:
                 data = response.json()
                 checkout_id = data.get('id')
                 result_code, result_description = get_result(data)
 
                 logger.debug('prepare_checkout success: id=%s, code=%s "%s"',
                              checkout_id, result_code, result_description)
-                self.transaction.checkout_id = checkout_id
-                self.transaction.result_code = result_code
-                self.transaction.result_description = result_description
-            else:
-                #TODO: Add error handling
-                pass
+
+                self._update_transaction(
+                    checkout_id=checkout_id,
+                    result_code=result_code,
+                    result_description=result_description,
+                )
             self.transaction.save()
 
         else:
