@@ -158,6 +158,11 @@ class Facade(object):
             # overwrite fields with data from step 1
             result_code=result_code,
             result_description=result_description,
+            raw_request=response.request.body or '',
+            raw_response=response.content,
+            response_time=response.elapsed.total_seconds() * 1000,
+            # save
+            commit=True,
         )
 
         try:
