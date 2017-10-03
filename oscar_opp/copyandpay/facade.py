@@ -21,11 +21,19 @@ def get_result(data):
 
 class Facade(object):
     def __init__(self, checkout_id=None):
+        """
+        Initialize OPP COPYandPAY facade.
+
+        A `checkout_id` must be given to continue in step 3.
+        It is initially retrieved and set in step 1 (prepare_checkout).
+
+        :param checkout_id:
+        """
         self.gateway = Gateway(
             host=settings.OPP_BASE_URL,
             auth_userid=settings.OPP_USER_ID,
             auth_entityid=settings.OPP_ENTITY_ID,
-            auth_password=settings.OPP_PASSWORD
+            auth_password=settings.OPP_PASSWORD,
         )
         if checkout_id:
             self.transaction = Transaction.objects.get(
@@ -78,14 +86,15 @@ class Facade(object):
                 checkout_id = data.get('id')
                 result_code, result_description = get_result(data)
 
-                logger.debug('prepare_checkout success: id=%s, code=%s "%s"',
+                logger.info('prepare_checkout success: checkout_id="%s", '
+                            'result_code="%s", result_description="%s"',
                              checkout_id, result_code, result_description)
-
                 self._update_transaction(
                     checkout_id=checkout_id,
                     result_code=result_code,
                     result_description=result_description,
                 )
+
             self.transaction.save()
 
         else:
@@ -103,17 +112,27 @@ class Facade(object):
         """
         response = self.gateway.get_payment_status(self.transaction.checkout_id)
         if not response.ok:
-            logger.error('get_payment_status: %s', response.status_code)
+            logger.error(
+                'get_payment_status failed: checkout_id="%s", status_code=%s',
+                self.transaction.checkout_id,
+                response.status_code,
+            )
             return PaymentStatusCode.UNKNOWN_ERROR
 
         data = response.json()
         entity_id = data.get('id')
         result_code, result_description = get_result(data)
-        logger.debug('get_payment_status: entity_id=%s, code=%s',
-                     entity_id, result_code)
+        logger.info(
+            'get_payment_status success: checkout_id="%s", entity_id="%s", '
+            'result_code="%s", result_description="%s"',
+            self.transaction.checkout_id, entity_id, result_code,
+            result_description,
+        )
 
         self._update_transaction(
+            # save payment transaction entity id (used in notifications)
             entity_id=entity_id,
+            # overwrite fields with data from step 1
             result_code=result_code,
             result_description=result_description,
         )
@@ -121,7 +140,7 @@ class Facade(object):
         try:
             return PaymentStatusCode(result_code)
         except ValueError:
-            # response doesn't contain valid JSON or the result_code is unknown
+            logger.warning('unknown result_code: %s', result_code)
             return PaymentStatusCode.UNKNOWN_ERROR
 
     def get_payment_brands(self, payment_method=None):
