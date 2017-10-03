@@ -42,6 +42,21 @@ class Facade(object):
         else:
             self.transaction = None
 
+    @property
+    def entity_id(self):
+        if self.transaction:
+            return self.transaction.entity_id
+
+    @property
+    def currency(self):
+        if self.transaction:
+            return self.transaction.currency
+
+    @property
+    def amount(self):
+        if self.transaction:
+            return self.transaction.amount
+
     def _update_transaction(self, **kwargs):
         for key, value in kwargs:
             setattr(self.transaction, key, value)
