@@ -14,6 +14,11 @@ from ..models import PaymentStatusCode, Transaction
 logger = logging.getLogger('opp')
 
 
+def get_result(data):
+    result = data.get('result', {})
+    return result.get('code'), result.get('description')
+
+
 class Facade(object):
     def __init__(self, checkout_id=None):
         self.gateway = Gateway(
@@ -65,9 +70,7 @@ class Facade(object):
             if response.ok:
                 data = response.json()
                 checkout_id = data.get('id')
-                result = data.get('result', {})
-                result_code = result.get('code')
-                result_description = result.get('description')
+                result_code, result_description = get_result(data)
 
                 logger.debug('prepare_checkout success: id=%s, code=%s "%s"',
                              checkout_id, result_code, result_description)
