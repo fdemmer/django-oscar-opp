@@ -64,7 +64,7 @@ class Transaction(base.ResponseModel):
     CLEAN_REGEX = [
         (r'password=\w+&', 'password=XXXXXX&'),
         (r'userId=\w+&', 'userId=XXXXXX&'),
-        (r'entityID=\w+&', 'entityID=XXXXXX&')
+        (r'entityID=\w+&', 'entityID=XXXXXX&'),
     ]
 
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)

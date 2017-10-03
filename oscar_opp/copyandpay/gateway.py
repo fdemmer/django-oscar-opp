@@ -41,8 +41,12 @@ class Gateway(object):
         }
         return data
 
-    def get_checkout_id(self, amount, currency, payment_type, payment_brand=None,
-                         descriptor=None, merchant_transaction_id=None, merchant_invoice_id=None):
+    def get_checkout_id(self, amount, currency, payment_type,
+                        payment_brand=None,
+                        descriptor=None,
+                        merchant_transaction_id=None,
+                        merchant_invoice_id=None,
+                        ):
         """
         1. Prepare the checkout
 

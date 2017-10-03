@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import logging
 from decimal import Decimal as D
-from enum import Enum, unique
 
 from django.conf import settings
 from django.template.loader import get_template
