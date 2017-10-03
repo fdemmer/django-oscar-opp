@@ -64,7 +64,7 @@ class Transaction(base.ResponseModel):
     CLEAN_REGEX = [
         (r'password=\w+&', 'password=XXXXXX&'),
         (r'userId=\w+&', 'userId=XXXXXX&'),
-        (r'entityID=\w+&', 'entityID=XXXXXX&'),
+        (r'entityId=\w+&', 'entityId=XXXXXX&'),
     ]
 
     amount = models.DecimalField(
@@ -110,9 +110,14 @@ class Transaction(base.ResponseModel):
     def __str__(self):
         return "Transaction %s" % self.id
 
+    def apply_clean(self, value):
+        if value:
+            for regex, s in self.CLEAN_REGEX:
+                value = re.sub(regex, s, value)
+        return value
+
     def save(self, *args, **kwargs):
-        for regex, s in self.CLEAN_REGEX:
-            self.raw_request = re.sub(regex, s, self.raw_request)
+        self.raw_request = self.apply_clean(self.raw_request)
         return super(Transaction, self).save(*args, **kwargs)
 
     @property
