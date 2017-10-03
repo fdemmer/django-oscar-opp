@@ -14,7 +14,9 @@ class ResponseModel(models.Model):
     raw_response = models.TextField(max_length=512)
 
     response_time = models.FloatField(help_text=_("Response time in milliseconds"))
-    date_created = models.DateTimeField(auto_now_add=True)
+
+    date_created = models.DateTimeField(_('Created'), auto_now_add=True)
+    date_updated = models.DateTimeField(_('Last modified'), auto_now=True)
 
     class Meta:
         abstract = True

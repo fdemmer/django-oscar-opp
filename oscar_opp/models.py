@@ -67,7 +67,10 @@ class Transaction(base.ResponseModel):
         (r'entityID=\w+&', 'entityID=XXXXXX&'),
     ]
 
-    amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    amount = models.DecimalField(
+        max_digits=12, decimal_places=2,
+        blank=True, null=True,
+    )
     currency = models.CharField(
         max_length=8,
         blank=True,
@@ -79,8 +82,26 @@ class Transaction(base.ResponseModel):
         blank=True,
     )
 
-    checkout_id = models.CharField(max_length=48, unique=True, null=True, editable=False)
-    correlation_id = models.CharField(max_length=32, null=True, editable=False)
+    # checkout id (eg "2E04FECDB36CC98BA8C79B4AC348BA59.sbg-vm-tx02")
+    checkout_id = models.CharField(
+        max_length=48,
+        unique=True,
+        editable=False,
+    )
+    # merchant correlation id, eg. the invoice number
+    correlation_id = models.CharField(
+        max_length=32,
+        editable=False,
+    )
+    # transaction id (eg "8a829417554f038201554f4c4af304f5")
+    entity_id = models.CharField(
+        max_length=32,
+        unique=True,
+        # blank allowed, because this is set in 3rd step and is initially empty
+        # unique requires null=True to allow duplicate blank
+        blank=True, null=True,
+        editable=False,
+    )
 
     class Meta:
         verbose_name = _('Transaction')
