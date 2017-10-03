@@ -35,12 +35,9 @@ class Facade(object):
             auth_entityid=settings.OPP_ENTITY_ID,
             auth_password=settings.OPP_PASSWORD,
         )
+        self.transaction = None
         if checkout_id:
-            self.transaction = Transaction.objects.get(
-                checkout_id=checkout_id,
-            )
-        else:
-            self.transaction = None
+            self.transaction = Transaction.objects.get(checkout_id=checkout_id)
 
     @property
     def entity_id(self):
@@ -61,11 +58,12 @@ class Facade(object):
         for key, value in kwargs:
             setattr(self.transaction, key, value)
 
-    def prepare_checkout(self, amount, currency,
-                         payment_type='DB',
-                         merchant_invoice_id=None,
-                         merchant_transaction_id=None,
-                         ):
+    def prepare_checkout(
+            self, amount, currency,
+            payment_type='DB',
+            merchant_invoice_id=None,
+            merchant_transaction_id=None,
+    ):
         """
         COPYandPAY step 1: Prepare the checkout
 
