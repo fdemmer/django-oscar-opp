@@ -102,8 +102,21 @@ class Facade(object):
         :return:
         """
         response = self.gateway.get_payment_status(self.transaction.checkout_id)
-        result_code = response.json().get('result', {}).get('code')
-        logger.debug('get_payment_status: code=%s', result_code)
+        if not response.ok:
+            logger.error('get_payment_status: %s', response.status_code)
+            return PaymentStatusCode.UNKNOWN_ERROR
+
+        data = response.json()
+        entity_id = data.get('id')
+        result_code, result_description = get_result(data)
+        logger.debug('get_payment_status: entity_id=%s, code=%s',
+                     entity_id, result_code)
+
+        self._update_transaction(
+            entity_id=entity_id,
+            result_code=result_code,
+            result_description=result_description,
+        )
 
         try:
             return PaymentStatusCode(result_code)
