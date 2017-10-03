@@ -118,6 +118,7 @@ class Transaction(base.ResponseModel):
 
     def save(self, *args, **kwargs):
         self.raw_request = self.apply_clean(self.raw_request)
+        #TODO clean the response?
         return super(Transaction, self).save(*args, **kwargs)
 
     @property

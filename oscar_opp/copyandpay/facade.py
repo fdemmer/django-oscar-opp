@@ -141,10 +141,12 @@ class Facade(object):
                 self.transaction.checkout_id,
                 response.status_code,
             )
+            # TODO maybe return tuple with status and data?
             return PaymentStatusCode.UNKNOWN_ERROR
 
         data = response.json()
         entity_id = data.get('id')
+        #paymentBrand = data.get('paymentBrand')
         result_code, result_description = get_result(data)
         logger.info(
             'get_payment_status success: checkout_id="%s", entity_id="%s", '
@@ -167,12 +169,14 @@ class Facade(object):
         )
 
         try:
+            # TODO maybe return tuple with status and data?
             return PaymentStatusCode(result_code)
         except ValueError:
             logger.warning('unknown result_code: %s', result_code)
             return PaymentStatusCode.UNKNOWN_ERROR
 
     def get_payment_brands(self, payment_method=None):
+        # TODO settings should probably be loaded more careful, with defaults
         payment_method = payment_method \
             if payment_method else settings.DEFAULT_PAYMENT_METHOD
         return settings.OPP_PAYMENT_METHODS.get(payment_method)
