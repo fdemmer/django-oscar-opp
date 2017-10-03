@@ -68,10 +68,16 @@ class Transaction(base.ResponseModel):
     ]
 
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    currency = models.CharField(max_length=8, null=True, blank=True)
+    currency = models.CharField(
+        max_length=8,
+        blank=True,
+    )
 
     result_code = models.CharField(max_length=32)
-    result_description = models.CharField(max_length=512, null=True, blank=True)
+    result_description = models.CharField(
+        max_length=512,
+        blank=True,
+    )
 
     checkout_id = models.CharField(max_length=48, unique=True, null=True, editable=False)
     correlation_id = models.CharField(max_length=32, null=True, editable=False)
