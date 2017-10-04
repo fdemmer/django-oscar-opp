@@ -20,7 +20,7 @@ setup(
     license='MIT',
     description="Oscar payment backend for opp",
     long_description=read('README.rst'),
-    author='Raphael Grill, Ashley Camba Garrido',
+    author='Raphael Grill, Florian Demmer, Ashley Camba Garrido',
     author_email='r.grill@nousguide.com',
     packages=find_packages(),
     include_package_data=True,
