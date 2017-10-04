@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.conf import settings  # noqa
-
 # this is not django's AppConf!
 # https://django-appconf.readthedocs.io/en/latest/
 from appconf import AppConf
+# noinspection PyUnresolvedReferences
+from django.conf import settings  # noqa
 
 
 class OpenPasswordPlatformConf(AppConf):

@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import requests
-from urllib import parse
-import decimal as D
 import logging
-import datetime
-import json
+from urllib import parse
 
-from django.utils.encoding import python_2_unicode_compatible
+import requests
 
 logger = logging.getLogger('opp')
 

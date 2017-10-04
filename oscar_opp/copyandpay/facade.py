@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from decimal import Decimal as D
-
 import logging
+from decimal import Decimal as D
 from enum import Enum, unique
 
 from django.conf import settings
