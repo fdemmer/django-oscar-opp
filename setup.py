@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-import os
 import codecs
-from setuptools import setup, find_packages
+import os
+
+from setuptools import find_packages, setup
 
 
 def read(*parts):
@@ -12,13 +15,13 @@ def read(*parts):
 
 setup(
     name="django-oscar-opp",
-    version="0.1.0",
+    version="0.2.0",
     url='https://github.com/ashwoods/django-oscar-opp',
     license='MIT',
     description="Oscar payment backend for opp",
     long_description=read('README.rst'),
-    author='Ashley Camba Garrido',
-    author_email='a.camba@nousdigital.net',
+    author='Raphael Grill, Ashley Camba Garrido',
+    author_email='r.grill@nousguide.com',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,

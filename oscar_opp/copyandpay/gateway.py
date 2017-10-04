@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+import logging
+from urllib import parse
 
 import requests
-from urllib import parse
-import decimal as D
-import logging
-import datetime
-import json
-
-from django.utils.encoding import python_2_unicode_compatible
 
 logger = logging.getLogger('opp')
 
@@ -44,9 +41,23 @@ class Gateway(object):
         }
         return data
 
-    def get_checkout_id(self, amount, currency, payment_type, payment_brand=None,
-                         descriptor=None, merchant_transactionid=None, merchant_invoiceid=None):
+    def get_checkout_id(
+            self, amount, currency, payment_type,
+            payment_brand=None,
+            descriptor=None,
+            merchant_transaction_id=None,
+            merchant_invoice_id=None,
+    ):
+        """
+        1. Prepare the checkout
 
+        First, perform a server-to-server POST request to prepare the checkout
+        with the required data, including the order type, amount and currency.
+        The response to a successful request is a JSON string with an id,
+        which is required in the second step to create the payment form.
+
+        https://docs.oppwa.com/tutorials/integration-guide#CNPStep1
+        """
         data = self.get_credentials()
         data.update({
             'amount': amount,
@@ -58,20 +69,34 @@ class Gateway(object):
             data['paymentBrand'] = payment_brand
         if descriptor:
             data['descriptor'] = descriptor
-        if merchant_transactionid:
-            data['merchantTransactionId	'] = merchant_transactionid
-        if merchant_invoiceid:
-            data['merchantInvoiceId'] = merchant_invoiceid
+        if merchant_transaction_id:
+            data['merchantTransactionId'] = merchant_transaction_id
+        if merchant_invoice_id:
+            data['merchantInvoiceId'] = merchant_invoice_id
 
         response = requests.post(
             parse.urljoin(self.host, self.CHECKOUTS_ENDPOINT),
             data
         )
+        logger.debug('RESPONSE: Url: {}\nHeaders: {}\nStatus: {}\nData: {}'.format(response.url, response.headers, response.status_code, repr(response.content)))
         return response
 
     def get_payment_status(self, checkout_id):
+        """
+        3. Get the payment status
+
+        Once the payment has been processed, the customer is redirected to your
+        'shopperResultUrl' along with a GET parameter 'resourcePath'.
+
+        Then, to get the status of the payment, you should make a GET request
+        to the 'baseUrl' + 'resourcePath', including your authentication
+        parameters.
+
+        https://docs.oppwa.com/tutorials/integration-guide#CNPStep3
+        """
         response = requests.get(
             parse.urljoin(self.host, self.CHECKOUTS_DETAIL_ENDPOINT.format(checkout_id=checkout_id))
         )
-        return response.status_code
+        logger.debug('Url: {}\nHeaders: {}\nStatus: {}\nData: {}'.format(response.url, response.headers, response.status_code, repr(response.content)))
+        return response
 
