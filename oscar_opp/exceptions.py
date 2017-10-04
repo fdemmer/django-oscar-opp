@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+
 try:
     from oscar.apps.payment.exceptions import PaymentError
 except ImportError:
