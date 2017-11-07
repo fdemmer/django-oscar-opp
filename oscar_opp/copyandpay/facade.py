@@ -145,6 +145,7 @@ class Facade(object):
 
         data = response.json()
         entity_id = data.get('id')
+        #payment_brand = data.get('paymentBrand')
         result_code, result_description = get_result(data)
         logger.info(
             'get_payment_status success: checkout_id="%s", entity_id="%s", '
