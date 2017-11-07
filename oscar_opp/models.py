@@ -25,6 +25,7 @@ class PaymentStatusCode(Enum):
     TRANSACTION_REJECTED_NO_3D_PROGRAM = '100.390.108'
     CANNOT_FIND_TRANSACTION = '700.400.580'
     TRANSACTION_DECLINED = '800.100.152'
+    TRANSACTION_DECLINED_INVALID_CONFIG = '800.100.190'
     TRANSACTION_DECLINED_INVALID_CARD = '800.100.151'
 
     def get_message(self):
@@ -39,7 +40,8 @@ class PaymentStatusCode(Enum):
             PaymentStatusCode.TRANSACTION_REJECTED_NO_3D_PROGRAM: 'Die Zahlung kann mit dieser Kreditkarte nicht durchgeführt werden.',
             PaymentStatusCode.CANNOT_FIND_TRANSACTION: 'Unbekannte Kreditkarte',
             PaymentStatusCode.TRANSACTION_DECLINED: 'Transaktion wurde abgelehnt.',
-            PaymentStatusCode.TRANSACTION_DECLINED_INVALID_CARD: 'Unbekannte Kreditkarte'
+            PaymentStatusCode.TRANSACTION_DECLINED_INVALID_CONFIG: _('transaction declined (invalid configuration data)'),
+            PaymentStatusCode.TRANSACTION_DECLINED_INVALID_CARD: 'Unbekannte Kreditkarte',
         }
         return descriptions.get(self, '')
 
@@ -48,6 +50,7 @@ class PaymentStatusCode(Enum):
 
 
 VALID_STATUS = [
+    PaymentStatusCode.TRANSACTION_SUCCEEDED,
     PaymentStatusCode.SUCCESSFUL_REQUEST,
     PaymentStatusCode.SUCCESS_CONNECTOR_TEST_MODE,
     PaymentStatusCode.SUCCESS_INTEGRATOR_TEST_MODE,
